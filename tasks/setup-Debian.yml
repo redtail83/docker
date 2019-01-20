@@ -1,0 +1,28 @@
+---
+# file: roles/docker/tasks/setup-Debian.yml
+
+# install docker-ce
+- name: be sure packages is installed on Debian family which allow apt to use a repository over HTTPS
+  package: name={{ item }} state=present
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+
+- name: set dockers official gpg key
+  apt_key:
+      url: "https://download.docker.com/linux/ubuntu/gpg"
+      state: present
+  register: set_key
+
+- name: set up the stable repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+  when: set_key
+  register: set_repo
+
+- name: be sure docker-ce is installed on Debian family
+  package: name=docker-ce state=present
+  when:  set_repo

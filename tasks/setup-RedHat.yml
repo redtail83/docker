@@ -1,0 +1,22 @@
+---
+# file: roles/docker/tasks/setup-RedHat.yml
+
+# install docker-ce
+- name: install yum-utils
+  yum: name=yum-utils state=present
+
+- name: add docker repo
+  shell: "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
+  args:
+    chdir: "/etc/yum.repos.d"
+    creates: docker-ce.repo
+
+- name: install docker-ce
+  yum: name=docker-ce state=present
+
+- name: add group
+  user: name=root groups=docker append=yes
+  tags: dockerhost
+  become: True
+  notify:
+    - restart docker on RedHat family

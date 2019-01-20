@@ -1,0 +1,11 @@
+---
+# handlers file for docker
+
+# restart docker service
+- name: restart docker on RedHat family
+  systemd:
+    name: docker.service
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+  when: ansible_os_family == 'RedHat'
